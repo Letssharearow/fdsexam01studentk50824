@@ -32,6 +32,11 @@ public class WebApiClient
 		return new WebApiResponse(deserializeToProject(response), response.code());
 	}
 
+	public WebApiResponse loadByURL(String url) throws IOException{
+		final Response response = sendGetRequest(url);
+		return new WebApiResponse(deserializeToProject(response), response.code());
+	}
+
 	public WebApiResponse loadAllProjects() throws IOException
 	{
 		return loadAllProjectsByNameTypeAndSemester("", "", "");
@@ -60,20 +65,24 @@ public class WebApiClient
 		return new WebApiResponse(deserializeToProjectCollection(response), response.code());
 	}
 
-	public WebApiResponse postProject(Project project) throws IOException
+	public WebApiResponse postProject(ProjectView project) throws IOException
 	{
-		final Response response = sendPostRequest(project);
+		final okhttp3.Response response = sendPostRequest(project);
 		return new WebApiResponse(response, response.code());
+	}
+
+	public WebApiResponse deleteProject(long projectId) throws IOException{
+		final Response response = sendDeleteRequest(projectId);
+		return new WebApiResponse(response.code());
 	}
 
 	private Response sendGetRequest(final String url) throws IOException
 	{
 		final Request request = new Request.Builder().url(url).get().build();
-
 		return this.client.newCall(request).execute();
 	}
 
-	private Response sendPostRequest(final Project project) throws IOException
+	private Response sendPostRequest(final ProjectView project) throws IOException
 	{
 		String projectJSON = genson.serialize(project);
 		RequestBody body = RequestBody.create(MediaType.parse("application/json"), projectJSON);
@@ -81,6 +90,11 @@ public class WebApiClient
 		return this.client.newCall(request).execute();
 	}
 
+	private Response sendDeleteRequest(final long id) throws IOException {
+		String url = URL + "/" + id;
+		final Request request = new Request.Builder().url(url).delete().build();
+		return this.client.newCall(request).execute();
+	}
 	//TODO Delete, Put, Create
 	//TODO LoadProjectByTypeAndName
 	//TODO LoadProjectByTypeAndSemester
