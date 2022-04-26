@@ -42,22 +42,22 @@ public class WebApiClient
 		return loadAllProjectsByNameTypeAndSemester("", "", "");
 	}
 
-	public WebApiResponse loadAllProjectsByName(final String name) throws IOException
-	{
-		return loadAllProjectsByNameTypeAndSemester(name, "", "");
-	}
+//	public WebApiResponse loadAllProjectsByName(final String name) throws IOException
+//	{
+//		return loadAllProjectsByNameTypeAndSemester(name, "", "");
+//	}
+//
+//	public WebApiResponse loadAllProjectsByType(final String type) throws IOException
+//	{
+//		return loadAllProjectsByNameTypeAndSemester("", type, "");
+//	}
+//
+//	public WebApiResponse loadAllProjectsByLastName(final String semester) throws IOException
+//	{
+//		return loadAllProjectsByNameTypeAndSemester("", "", semester);
+//	}
 
-	public WebApiResponse loadAllProjectsByType(final String type) throws IOException
-	{
-		return loadAllProjectsByNameTypeAndSemester("", type, "");
-	}
-
-	public WebApiResponse loadAllProjectsByLastName(final String semester) throws IOException
-	{
-		return loadAllProjectsByNameTypeAndSemester("", "", semester);
-	}
-
-	private WebApiResponse loadAllProjectsByNameTypeAndSemester(final String name, final String type,
+	public WebApiResponse loadAllProjectsByNameTypeAndSemester(final String name, final String type,
 		final String semester) throws IOException
 	{
 		final String theUrl = String.format("%s?name=%s&type=%s&semester=%s", URL, name, type, semester);

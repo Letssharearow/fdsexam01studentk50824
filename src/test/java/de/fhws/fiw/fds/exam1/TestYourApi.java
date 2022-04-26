@@ -17,16 +17,12 @@
 package de.fhws.fiw.fds.exam1;
 
 import de.fhws.fiw.fds.exam1.client.*;
-import de.fhws.fiw.fds.exam1.models.Project;
-import de.fhws.fiw.fds.exam1.models.Student;
-import de.fhws.fiw.fds.exam1.models.Supervisor;
 import org.junit.Test;
 
-import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -83,8 +79,8 @@ public class TestYourApi
 	{
 		final WebApiClient client = new WebApiClient();
 		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
-				(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
-				(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+				(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
+				(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
 				"programming project");
 		long project1Id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
 		long project2Id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
@@ -122,6 +118,42 @@ public class TestYourApi
 
 		client.deleteProject(project1Id);
 		client.deleteProject(project2Id);
+	}
+
+	@Test public void load_all_projects_By_Name_Semster_Type() throws IOException
+	{
+		final WebApiClient client = new WebApiClient();
+		long project1Id = client.loadByURL(client.postProject(new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
+				(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
+				(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+				"duplicateTypeForTesting")).getLocation()).getResponseData().stream().findFirst().get().getId();
+
+		long project2Id = client.loadByURL(client.postProject(new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
+				(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
+				(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "0000ss",
+				"programming project")).getLocation()).getResponseData().stream().findFirst().get().getId();
+
+		long project3Id = client.loadByURL(client.postProject(new ProjectView("template", "we try to create an API for projects",
+				(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
+				(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "0000ss",
+				"duplicateTypeForTesting")).getLocation()).getResponseData().stream().findFirst().get().getId();
+		//TODO: überlegen, ob es eine sinvollere Struktur gibt
+
+		final WebApiResponse responseName = client.loadAllProjectsByNameTypeAndSemester("duplicateNameForTesting","","");
+		assertEquals(200, responseName.getLastStatusCode());
+		assertEquals(2, responseName.getResponseData().size());
+
+		final WebApiResponse responseType = client.loadAllProjectsByNameTypeAndSemester("duplicateNameForTesting","","");
+		assertEquals(200, responseType.getLastStatusCode());
+		assertEquals(2, responseType.getResponseData().size());
+
+		final WebApiResponse responseSemester = client.loadAllProjectsByNameTypeAndSemester("duplicateNameForTesting","","");
+		assertEquals(200, responseSemester.getLastStatusCode());
+		assertEquals(2, responseSemester.getResponseData().size());
+
+		assertEquals(204, client.deleteProject(project1Id).getLastStatusCode());
+		assertEquals(204, client.deleteProject(project2Id).getLastStatusCode());
+		assertEquals(204, client.deleteProject(project3Id).getLastStatusCode());
 	}
 
 	@Test public void post_project() throws IOException
