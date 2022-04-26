@@ -71,6 +71,12 @@ public class WebApiClient
 		return new WebApiResponse(response, response.code());
 	}
 
+	public WebApiResponse putProject(ProjectView project, long projectId) throws IOException
+	{
+		final okhttp3.Response response = sendPutRequest(project, projectId);
+		return new WebApiResponse(response.code());
+	}
+
 	public WebApiResponse deleteProject(long projectId) throws IOException{
 		final Response response = sendDeleteRequest(projectId);
 		return new WebApiResponse(response.code());
@@ -82,18 +88,32 @@ public class WebApiClient
 		return this.client.newCall(request).execute();
 	}
 
+	private Response sendPutRequest(final ProjectView projectView, final long projectId) throws IOException
+	{
+		String url = getURLFromId(projectId);
+		final Request request = new Request.Builder().url(url).put(getProjecteRequestBody(projectView)).build();
+		return this.client.newCall(request).execute();
+	}
+
 	private Response sendPostRequest(final ProjectView project) throws IOException
 	{
-		String projectJSON = genson.serialize(project);
-		RequestBody body = RequestBody.create(MediaType.parse("application/json"), projectJSON);
-		final Request request = new Request.Builder().url(URL).post(body).build();
+		final Request request = new Request.Builder().url(URL).post(getProjecteRequestBody(project)).build();
 		return this.client.newCall(request).execute();
 	}
 
 	private Response sendDeleteRequest(final long id) throws IOException {
-		String url = URL + "/" + id;
+		String url = getURLFromId(id);
 		final Request request = new Request.Builder().url(url).delete().build();
 		return this.client.newCall(request).execute();
+	}
+
+	private String getURLFromId(final long projectId){
+		return URL + "/" + projectId;
+	}
+
+	private RequestBody getProjecteRequestBody(ProjectView projectView){
+		String projectJSON = genson.serialize(projectView);
+		return RequestBody.create(MediaType.parse("application/json"), projectJSON);
 	}
 	//TODO Delete, Put, Create
 	//TODO LoadProjectByTypeAndName

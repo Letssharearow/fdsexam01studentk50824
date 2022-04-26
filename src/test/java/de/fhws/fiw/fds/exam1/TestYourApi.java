@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -34,14 +35,13 @@ import static org.junit.Assert.assertTrue;
 public class TestYourApi
 {
 
-	@Test public void load_existing_project_by_id_status200() throws IOException
+	@Test public void load_project_by_id_status200() throws IOException
 	{
 		final WebApiClient client = new WebApiClient();
 		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
 				(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
 				(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
 				"programming project");
-		client.postProject(projectViewPost);
 		//TODO: überlegen, ob es eine sinvollere Struktur gibt
 		long id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
 
@@ -79,9 +79,54 @@ public class TestYourApi
 		client.deleteProject(project.getId());
 	}
 
+	@Test public void load_all_projects() throws IOException
+	{
+		final WebApiClient client = new WebApiClient();
+		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
+				(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
+				(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+				"programming project");
+		long project1Id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
+		long project2Id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
+		//TODO: überlegen, ob es eine sinvollere Struktur gibt
+
+		final WebApiResponse response = client.loadAllProjects();
+		assertEquals(200, response.getLastStatusCode());
+		assertEquals(2, response.getResponseData().size());
+
+		final Collection<ProjectView> result = response.getResponseData();
+		assertTrue(!result.isEmpty());
+		final ProjectView projectFirst = result.stream().findFirst().get();
+
+		assertEquals("template", projectFirst.getName());
+		assertEquals("programming project", projectFirst.getType());
+		assertEquals("2022ss", projectFirst.getSemester());
+
+		Optional<StudentView> studentView = projectFirst.getStudents().stream().findFirst();
+		assertTrue(studentView.isPresent());
+		StudentView studentViewJulian = studentView.get();
+
+		assertEquals("Julian", studentViewJulian.getFirstName());
+		assertEquals("Sehne", studentViewJulian.getLastName());
+		assertEquals("BIN", studentViewJulian.getCourse());
+		assertEquals(4, studentViewJulian.getSemester());
+
+		Optional<SupervisorView> supervisor = projectFirst.getSupervisors().stream().findFirst();
+		assertTrue(supervisor.isPresent());
+		SupervisorView supervisorViewBraun = supervisor.get();
+
+		assertEquals("Peter", supervisorViewBraun.getFirstName());
+		assertEquals("Braun", supervisorViewBraun.getLastName());
+		assertEquals("Prof.", supervisorViewBraun.getTitle());
+		assertEquals("peter.braun@fhws.de", supervisorViewBraun.getEmail());
+
+		client.deleteProject(project1Id);
+		client.deleteProject(project2Id);
+	}
+
 	@Test public void post_project() throws IOException
 	{
-		ProjectView projectPost = new ProjectView("testProject", "", Arrays.asList(new StudentView("Paul", "Nummer", "BEC", 2)), Arrays.asList(new SupervisorView("Steffen", "Heinzl", "Prof", "Steffen.heinzl@fhws.de")), "1999ws", "type");
+		ProjectView projectPost = new ProjectView("testProject", "", Arrays.asList(new StudentView("Paul", "Nummer", "BEC", 2)), Arrays.asList(new SupervisorView("Steffen", "Heinzl", "Prof", "steffen.heinzl@fhws.de")), "1999ws", "type");
 		final WebApiClient client = new WebApiClient();
 		WebApiResponse responsePost = client.postProject(projectPost);
 		assertEquals(201, responsePost.getLastStatusCode());
@@ -105,6 +150,15 @@ public class TestYourApi
 		assertEquals("BEC", studentViewJulian.getCourse());
 		assertEquals(2, studentViewJulian.getSemester());
 
+		Optional<SupervisorView> superVisorView = projectGet.getSupervisors().stream().findFirst();
+		assertTrue(superVisorView.isPresent());
+		SupervisorView superVisorViewPresent = superVisorView.get();
+
+		assertEquals("Steffen", superVisorViewPresent.getFirstName());
+		assertEquals("Heinzl", superVisorViewPresent.getLastName());
+		assertEquals("Prof", superVisorViewPresent.getTitle());
+		assertEquals("steffen.heinzl@fhws.de", superVisorViewPresent.getEmail());
+
 		client.deleteProject(projectGet.getId());
 	}
 
@@ -120,6 +174,58 @@ public class TestYourApi
 		final WebApiResponse response = client.deleteProject(id);
 		assertEquals(204, response.getLastStatusCode());
 	}
+
+	@Test public void put_project() throws IOException
+	{
+		final WebApiClient client = new WebApiClient();
+		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
+				(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
+				(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+				"programming project");
+		long projectId = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
+
+		ProjectView projectViewPut = new ProjectView("newName", "newDescription",
+				(Arrays.asList(new StudentView("newStudentName", "newStudentLastName", "newCourse", 7))),
+				(Arrays.asList(new SupervisorView("newSupervisorName", "newSupervisorLastName", "newTitle", "newEmail"))), "newSemester",
+				"newType");
+
+		projectViewPut.setId(projectId);
+
+		final WebApiResponse responsePut = client.putProject(projectViewPut, projectId);
+		assertEquals(204, responsePut.getLastStatusCode());
+
+		WebApiResponse responseGet = client.loadById(projectId);
+		final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
+		assertTrue(result.isPresent());
+		final ProjectView projectGet = result.get();
+
+		assertEquals("newName", projectGet.getName());
+		assertEquals("newType", projectGet.getType());
+		assertEquals("newSemester", projectGet.getSemester());
+
+		Optional<StudentView> studentView = projectGet.getStudents().stream().findFirst();
+		assertTrue(studentView.isPresent());
+		StudentView studentViewJulian = studentView.get();
+
+		assertEquals("newStudentName", studentViewJulian.getFirstName());
+		assertEquals("newStudentLastName", studentViewJulian.getLastName());
+		assertEquals("newCourse", studentViewJulian.getCourse());
+		assertEquals(7, studentViewJulian.getSemester());
+
+		Optional<SupervisorView> superVisorView = projectGet.getSupervisors().stream().findFirst();
+		assertTrue(superVisorView.isPresent());
+		SupervisorView superVisorViewPresent = superVisorView.get();
+
+		assertEquals("newSupervisorName", superVisorViewPresent.getFirstName());
+		assertEquals("newSupervisorLastName", superVisorViewPresent.getLastName());
+		assertEquals("newTitle", superVisorViewPresent.getTitle());
+		assertEquals("newEmail", superVisorViewPresent.getEmail());
+
+		client.deleteProject(projectGet.getId());
+
+	}
+
+
 
 	//TODO: all four CRUD operations
 }
