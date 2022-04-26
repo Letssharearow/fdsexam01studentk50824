@@ -1,12 +1,8 @@
 package de.fhws.fiw.fds.exam1.database;
 
-import de.fhws.fiw.fds.exam1.models.Person;
 import de.fhws.fiw.fds.exam1.models.Project;
-import de.fhws.fiw.fds.exam1.models.Student;
-import de.fhws.fiw.fds.exam1.models.Supervisor;
 import org.apache.commons.lang.StringUtils;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
@@ -32,12 +28,8 @@ public class ProjectStorage
 
 	private ProjectStorage()
 	{
+		this.key = new AtomicLong(1L);
 		this.storage = new HashMap<>();
-		this.key = new AtomicLong(1l);
-		create(new Project("template", "we try to create an API for projects",
-			(Arrays.asList(new Student("Julian", "Sehne", "BIN", 4))),
-			(Arrays.asList(new Supervisor("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
-			"programming project"));
 	}
 
 	public void create(final Project project)
