@@ -52,10 +52,9 @@ public class WebApiResponse
 
 	public String getLocation()
 	{
-		List<Object> location = this.response.getHeaders().get("Location");
-		Object something = location.get(0);
-		System.out.println(something);
-		return "";
+		String location = this.response.header("Location");
+		System.out.println(location);
+		return location;
 	}
 
 	private static Collection<ProjectView> convertToList(final Optional<ProjectView> projectView)
