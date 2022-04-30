@@ -26,13 +26,13 @@ public class WebApiClient
 		this.genson = new Genson();
 	}
 
-	public WebApiResponse loadById(final long id) throws IOException
+	public WebApiResponse loadProjectById(final long id) throws IOException
 	{
 		final String theUrl = String.format("%s/%d", URL, id);
-		return loadByURL(theUrl);
+		return loadProjectByURL(theUrl);
 	}
 
-	public WebApiResponse loadByURL(String url) throws IOException
+	public WebApiResponse loadProjectByURL(String url) throws IOException
 	{
 		final Response response = sendGetRequest(url);
 		try
@@ -92,13 +92,13 @@ public class WebApiClient
 	private Response sendPutRequest(final ProjectView projectView, final long projectId) throws IOException
 	{
 		String url = getURLFromId(projectId);
-		final Request request = new Request.Builder().url(url).put(getProjecteRequestBody(projectView)).build();
+		final Request request = new Request.Builder().url(url).put(getProjectRequestBody(projectView)).build();
 		return this.client.newCall(request).execute();
 	}
 
-	private Response sendPostRequest(final ProjectView project) throws IOException
+	private Response sendPostRequest(final ProjectView projectViewproject) throws IOException
 	{
-		final Request request = new Request.Builder().url(URL).post(getProjecteRequestBody(project)).build();
+		final Request request = new Request.Builder().url(URL).post(getProjectRequestBody(projectViewproject)).build();
 		return this.client.newCall(request).execute();
 	}
 
@@ -114,7 +114,7 @@ public class WebApiClient
 		return URL + "/" + projectId;
 	}
 
-	private RequestBody getProjecteRequestBody(ProjectView projectView)
+	private RequestBody getProjectRequestBody(ProjectView projectView)
 	{
 		String projectJSON = genson.serialize(projectView);
 		return RequestBody.create(MediaType.parse("application/json"), projectJSON);

@@ -1,9 +1,7 @@
 package de.fhws.fiw.fds.exam1.client;
 
-import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 public class WebApiResponse
@@ -51,9 +49,7 @@ public class WebApiResponse
 
 	public String getLocation()
 	{
-		String location = this.response.header("Location");
-		System.out.println(location);
-		return location;
+		return this.response.header("Location");
 	}
 
 	private static Collection<ProjectView> convertToList(final Optional<ProjectView> projectView)

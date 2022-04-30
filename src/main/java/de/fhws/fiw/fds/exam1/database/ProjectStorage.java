@@ -7,7 +7,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -92,11 +91,6 @@ public class ProjectStorage
 	public void deleteById(final long id)
 	{
 		this.storage.remove(id);
-	}
-
-	public Collection<Project> findAll()
-	{
-		return findBy("", "", "");
 	}
 
 	public Collection<Project> findBy(final String name, final String type, final String semester)

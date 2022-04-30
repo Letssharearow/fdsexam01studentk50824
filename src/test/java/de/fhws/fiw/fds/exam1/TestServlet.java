@@ -28,7 +28,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TestYourApi
+public class TestServlet
 {
 
 	//GET
@@ -39,10 +39,10 @@ public class TestYourApi
 			(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
 			(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
 			"programming project");
-		long id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+		long id = client.loadProjectByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
 			.findFirst().get().getId();
 
-		final WebApiResponse response = client.loadById(id);
+		final WebApiResponse response = client.loadProjectById(id);
 
 		assertEquals(200, response.getLastStatusCode());
 		assertEquals(1, response.getResponseData().size());
@@ -76,17 +76,17 @@ public class TestYourApi
 		assertEquals(204, client.deleteProject(project.getId()).getLastStatusCode());
 	}
 
-	@Test public void load_all_projects() throws IOException
+	@Test public void load_all_projects_status200() throws IOException
 	{
 		final WebApiClient client = new WebApiClient();
 		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
 			(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
 			(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
 			"programming project");
-		long project1Id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
-			.findFirst().get().getId();
-		long project2Id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
-			.findFirst().get().getId();
+		long project1Id = client.loadProjectByURL(client.postProject(projectViewPost).getLocation()).getResponseData()
+			.stream().findFirst().get().getId();
+		long project2Id = client.loadProjectByURL(client.postProject(projectViewPost).getLocation()).getResponseData()
+			.stream().findFirst().get().getId();
 
 		final WebApiResponse response = client.loadAllProjects();
 		assertEquals(200, response.getLastStatusCode());
@@ -122,23 +122,23 @@ public class TestYourApi
 		assertEquals(204, client.deleteProject(project2Id).getLastStatusCode());
 	}
 
-	@Test public void load_all_projects_By_Name_Semster_Type() throws IOException
+	@Test public void load_all_projects_By_Name_Semester_Type_status200() throws IOException
 	{
 		final WebApiClient client = new WebApiClient();
-		long project1Id = client.loadByURL(client.postProject(
+		long project1Id = client.loadProjectByURL(client.postProject(
 				new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
 					(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
 					(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
 					"2022ss", "duplicateTypeForTesting")).getLocation()).getResponseData().stream().findFirst().get()
 			.getId();
 
-		long project2Id = client.loadByURL(client.postProject(
+		long project2Id = client.loadProjectByURL(client.postProject(
 			new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
 				(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
 				(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
 				"0000ss", "programming project")).getLocation()).getResponseData().stream().findFirst().get().getId();
 
-		long project3Id = client.loadByURL(client.postProject(
+		long project3Id = client.loadProjectByURL(client.postProject(
 				new ProjectView("template", "we try to create an API for projects",
 					(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
 					(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
@@ -164,27 +164,27 @@ public class TestYourApi
 		assertEquals(204, client.deleteProject(project3Id).getLastStatusCode());
 	}
 
-	@Test public void wrong_input_on_get_status400()
+	@Test public void load_all_projects_By_Name_Semester_Type_status400()
 	{
 		final WebApiClient client = new WebApiClient();
 		long project1Id = 0;
 		try
 		{
-			project1Id = client.loadByURL(client.postProject(
+			project1Id = client.loadProjectByURL(client.postProject(
 					new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
 						(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
 						(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
 						"2022ss", "duplicateTypeForTesting")).getLocation()).getResponseData().stream().findFirst().get()
 				.getId();
 
-			long project2Id = client.loadByURL(client.postProject(
+			long project2Id = client.loadProjectByURL(client.postProject(
 					new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
 						(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
 						(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
 						"0000ss", "programming project")).getLocation()).getResponseData().stream().findFirst().get()
 				.getId();
 
-			long project3Id = client.loadByURL(client.postProject(
+			long project3Id = client.loadProjectByURL(client.postProject(
 					new ProjectView("template", "we try to create an API for projects",
 						(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
 						(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
@@ -217,9 +217,9 @@ public class TestYourApi
 		long id = 0;
 		try
 		{
-			id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+			id = client.loadProjectByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
 				.findFirst().get().getId();
-			final WebApiResponse response = client.loadById(0L);
+			final WebApiResponse response = client.loadProjectById(0L);
 			assertEquals(404, response.getLastStatusCode());
 			assertEquals(204, client.deleteProject(id).getLastStatusCode());
 		}
@@ -231,7 +231,7 @@ public class TestYourApi
 	}
 
 	//POST
-	@Test public void post_project()
+	@Test public void post_project_status201()
 	{
 		ProjectView projectPost = new ProjectView("testProject", "",
 			Arrays.asList(new StudentView("Paul", "Nummer", "BEC", 2)),
@@ -243,7 +243,7 @@ public class TestYourApi
 			responsePost = client.postProject(projectPost);
 			assertEquals(201, responsePost.getLastStatusCode());
 			String location = responsePost.getLocation();
-			WebApiResponse responseGet = client.loadByURL(location);
+			WebApiResponse responseGet = client.loadProjectByURL(location);
 
 			final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
 			assertTrue(result.isPresent());
@@ -292,7 +292,7 @@ public class TestYourApi
 			//Verify this Project is postable
 			assertEquals(201, responsePost.getLastStatusCode());
 			String location = responsePost.getLocation();
-			WebApiResponse responseGet = client.loadByURL(location);
+			WebApiResponse responseGet = client.loadProjectByURL(location);
 			final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
 			assertTrue(result.isPresent());
 			final ProjectView projectGet = result.get();
@@ -366,7 +366,7 @@ public class TestYourApi
 	}
 
 	//DELETE
-	@Test public void delete_project()
+	@Test public void delete_project_status204()
 	{
 		final WebApiClient client = new WebApiClient();
 		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
@@ -376,7 +376,7 @@ public class TestYourApi
 		long id = 0;
 		try
 		{
-			id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+			id = client.loadProjectByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
 				.findFirst().get().getId();
 			final WebApiResponse response = client.deleteProject(id);
 			assertEquals(204, response.getLastStatusCode());
@@ -399,7 +399,7 @@ public class TestYourApi
 		long id = 0;
 		try
 		{
-			id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+			id = client.loadProjectByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
 				.findFirst().get().getId();
 			final WebApiResponse response = client.deleteProject(0L);
 			assertEquals(404, response.getLastStatusCode());
@@ -423,8 +423,8 @@ public class TestYourApi
 		long projectId = 0;
 		try
 		{
-			projectId = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
-				.findFirst().get().getId();
+			projectId = client.loadProjectByURL(client.postProject(projectViewPost).getLocation()).getResponseData()
+				.stream().findFirst().get().getId();
 			ProjectView projectViewPut = new ProjectView("newName", "newDescription",
 				(Arrays.asList(new StudentView("newStudentName", "newStudentLastName", "BAB", 7))), (Arrays.asList(
 				new SupervisorView("newSupervisorName", "newSupervisorLastName", "newTitle", "newEmail@test.de"))),
@@ -435,7 +435,7 @@ public class TestYourApi
 			final WebApiResponse responsePut = client.putProject(projectViewPut, projectId);
 			assertEquals(204, responsePut.getLastStatusCode());
 
-			WebApiResponse responseGet = client.loadById(projectId);
+			WebApiResponse responseGet = client.loadProjectById(projectId);
 
 			final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
 			assertTrue(result.isPresent());
@@ -482,8 +482,8 @@ public class TestYourApi
 		long projectId = 0;
 		try
 		{
-			projectId = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
-				.findFirst().get().getId();
+			projectId = client.loadProjectByURL(client.postProject(projectViewPost).getLocation()).getResponseData()
+				.stream().findFirst().get().getId();
 			ProjectView projectViewPut = new ProjectView("newName", "newDescription",
 				(Arrays.asList(new StudentView("newStudentName", "newStudentLastName", "newCourse", 7))),
 				(Arrays.asList(
@@ -495,7 +495,7 @@ public class TestYourApi
 			final WebApiResponse responsePut = client.putProject(projectViewPut, 0L);
 			assertEquals(404, responsePut.getLastStatusCode());
 
-			WebApiResponse responseGet = client.loadById(projectId);
+			WebApiResponse responseGet = client.loadProjectById(projectId);
 
 			final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
 			assertTrue(result.isPresent());
@@ -542,8 +542,8 @@ public class TestYourApi
 		long projectId = 0;
 		try
 		{
-			projectId = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
-				.findFirst().get().getId();
+			projectId = client.loadProjectByURL(client.postProject(projectViewPost).getLocation()).getResponseData()
+				.stream().findFirst().get().getId();
 			ProjectView incorrectProject = new ProjectView("newName", "newDescription",
 				(Arrays.asList(new StudentView("newStudentName", "newStudentLastName", "newCourse", 7))),
 				(Arrays.asList(
@@ -555,7 +555,7 @@ public class TestYourApi
 			WebApiResponse responsePut = client.putProject(incorrectProject, 1L);
 			assertEquals(400, responsePut.getLastStatusCode());
 
-			WebApiResponse responseGet = client.loadById(projectId);
+			WebApiResponse responseGet = client.loadProjectById(projectId);
 			{
 				final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
 				assertTrue(result.isPresent());
