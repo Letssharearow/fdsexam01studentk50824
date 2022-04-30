@@ -9,7 +9,6 @@ import java.util.Optional;
 public class WebApiResponse
 {
 	private final Collection<ProjectView> responseData;
-	//TODO understand variables
 	private final int lastStatusCode;
 	private okhttp3.Response response;
 

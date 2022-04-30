@@ -2,6 +2,7 @@ package de.fhws.fiw.fds.exam1.client;
 
 import com.owlike.genson.GenericType;
 import com.owlike.genson.Genson;
+import com.owlike.genson.JsonBindingException;
 import de.fhws.fiw.fds.exam1.models.Project;
 import okhttp3.*;
 import okio.BufferedSink;
@@ -28,13 +29,20 @@ public class WebApiClient
 	public WebApiResponse loadById(final long id) throws IOException
 	{
 		final String theUrl = String.format("%s/%d", URL, id);
-		final Response response = sendGetRequest(theUrl);
-		return new WebApiResponse(deserializeToProject(response), response.code());
+		return loadByURL(theUrl);
 	}
 
-	public WebApiResponse loadByURL(String url) throws IOException{
+	public WebApiResponse loadByURL(String url) throws IOException
+	{
 		final Response response = sendGetRequest(url);
-		return new WebApiResponse(deserializeToProject(response), response.code());
+		try
+		{
+			return new WebApiResponse(deserializeToProject(response), response.code());
+		}
+		catch (JsonBindingException e)
+		{
+			return new WebApiResponse(response.code());
+		}
 	}
 
 	public WebApiResponse loadAllProjects() throws IOException
@@ -42,27 +50,19 @@ public class WebApiClient
 		return loadAllProjectsByNameTypeAndSemester("", "", "");
 	}
 
-//	public WebApiResponse loadAllProjectsByName(final String name) throws IOException
-//	{
-//		return loadAllProjectsByNameTypeAndSemester(name, "", "");
-//	}
-//
-//	public WebApiResponse loadAllProjectsByType(final String type) throws IOException
-//	{
-//		return loadAllProjectsByNameTypeAndSemester("", type, "");
-//	}
-//
-//	public WebApiResponse loadAllProjectsByLastName(final String semester) throws IOException
-//	{
-//		return loadAllProjectsByNameTypeAndSemester("", "", semester);
-//	}
-
 	public WebApiResponse loadAllProjectsByNameTypeAndSemester(final String name, final String type,
 		final String semester) throws IOException
 	{
 		final String theUrl = String.format("%s?name=%s&type=%s&semester=%s", URL, name, type, semester);
-		final okhttp3.Response response = sendGetRequest(theUrl);
-		return new WebApiResponse(deserializeToProjectCollection(response), response.code());
+		final Response response = sendGetRequest(theUrl);
+		try
+		{
+			return new WebApiResponse(deserializeToProjectCollection(response), response.code());
+		}
+		catch (JsonBindingException e)
+		{
+			return new WebApiResponse(response.code());
+		}
 	}
 
 	public WebApiResponse postProject(ProjectView project) throws IOException
@@ -77,7 +77,8 @@ public class WebApiClient
 		return new WebApiResponse(response.code());
 	}
 
-	public WebApiResponse deleteProject(long projectId) throws IOException{
+	public WebApiResponse deleteProject(long projectId) throws IOException
+	{
 		final Response response = sendDeleteRequest(projectId);
 		return new WebApiResponse(response.code());
 	}
@@ -101,24 +102,24 @@ public class WebApiClient
 		return this.client.newCall(request).execute();
 	}
 
-	private Response sendDeleteRequest(final long id) throws IOException {
+	private Response sendDeleteRequest(final long id) throws IOException
+	{
 		String url = getURLFromId(id);
 		final Request request = new Request.Builder().url(url).delete().build();
 		return this.client.newCall(request).execute();
 	}
 
-	private String getURLFromId(final long projectId){
+	private String getURLFromId(final long projectId)
+	{
 		return URL + "/" + projectId;
 	}
 
-	private RequestBody getProjecteRequestBody(ProjectView projectView){
+	private RequestBody getProjecteRequestBody(ProjectView projectView)
+	{
 		String projectJSON = genson.serialize(projectView);
 		return RequestBody.create(MediaType.parse("application/json"), projectJSON);
 	}
-	//TODO Delete, Put, Create
-	//TODO LoadProjectByTypeAndName
-	//TODO LoadProjectByTypeAndSemester
-	//TODO LoadProjectByNameAndSemester
+
 	private Collection<ProjectView> deserializeToProjectCollection(final Response response) throws IOException
 	{
 		final String data = response.body().string();

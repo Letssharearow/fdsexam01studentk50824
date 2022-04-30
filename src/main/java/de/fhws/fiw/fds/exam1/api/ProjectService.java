@@ -15,20 +15,30 @@ import java.util.Optional;
 
 	@Context protected UriInfo uriInfo;
 
-	@GET @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML }) public Response getProjects(
+	@GET @Produces({ MediaType.APPLICATION_JSON }) public Response getProjects(
 		@DefaultValue("") @QueryParam("name") final String name,
 		@DefaultValue("") @QueryParam("type") final String type,
 		@DefaultValue("") @QueryParam("semester") final String semester)
 	{
-		final Collection<Project> allProjects = this.projectStorage.findBy(name, type, semester);
-
+		Collection<Project> allProjects = null;
+		try
+		{
+			allProjects = this.projectStorage.findBy(name, type, semester);
+		}
+		catch (IllegalArgumentException e)
+		{
+			if (e.getMessage().equals(ProjectStorage.WRONG_FILTER_INPUT))
+			{
+				throw new WebApplicationException(Response.status(400).build());
+			}
+		}
 		return Response.ok(new GenericEntity<Collection<Project>>(allProjects)
 		{
 		}).build();
 	}
 
-	@GET @Path("{id: \\d+}") @Produces({ MediaType.APPLICATION_JSON,
-		MediaType.APPLICATION_XML }) public Response getProjectById(@PathParam("id") final long id)
+	@GET @Path("{id: \\d+}") @Produces({ MediaType.APPLICATION_JSON }) public Response getProjectById(
+		@PathParam("id") final long id)
 	{
 		final Optional<Project> project = this.projectStorage.readById(id);
 
@@ -40,29 +50,41 @@ import java.util.Optional;
 		return Response.ok(project.get()).build();
 	}
 
-	@POST @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML }) public Response createProject(
-		final Project project)
+	@POST @Consumes({ MediaType.APPLICATION_JSON }) public Response createProject(final Project project)
 	{
-		this.projectStorage.create(project);
+		try
+		{
+			this.projectStorage.create(project);
+		}
+		catch (IllegalArgumentException e)
+		{
+			throw new WebApplicationException(Response.status(400).build());
+		}
 		final URI locationURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(project.getId())).build();
 		return Response.created(locationURI).build();
 	}
 
-	@PUT @Path("{id: \\d+}") @Consumes({ MediaType.APPLICATION_JSON,
-		MediaType.APPLICATION_XML }) public Response updateProject(@PathParam("id") final long id,
-		final Project project)
+	@PUT @Path("{id: \\d+}") @Consumes({ MediaType.APPLICATION_JSON }) public Response updateProject(
+		@PathParam("id") final long id, final Project project)
 	{
 		if (id != project.getId())
 		{
 			throw new WebApplicationException(Response.status(400).build());
 		}
-		else if (this.projectStorage.containsId(id) == false)
+		else if (!this.projectStorage.containsId(id))
 		{
 			throw new WebApplicationException(Response.status(404).build());
 		}
 		else
 		{
-			this.projectStorage.update(project);
+			try
+			{
+				this.projectStorage.update(project);
+			}
+			catch (IllegalArgumentException e)
+			{
+				throw new WebApplicationException(Response.status(400).build());
+			}
 			return Response.noContent().build();
 		}
 	}
@@ -79,7 +101,5 @@ import java.util.Optional;
 			throw new WebApplicationException(Response.status(404).build());
 		}
 	}
-
-	//TODO: status codes
 }
 

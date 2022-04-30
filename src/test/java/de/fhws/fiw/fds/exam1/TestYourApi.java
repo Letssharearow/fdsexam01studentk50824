@@ -31,15 +31,16 @@ import static org.junit.Assert.assertTrue;
 public class TestYourApi
 {
 
+	//GET
 	@Test public void load_project_by_id_status200() throws IOException
 	{
 		final WebApiClient client = new WebApiClient();
 		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
-				(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
-				(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
-				"programming project");
-		//TODO: überlegen, ob es eine sinvollere Struktur gibt
-		long id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
+			(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
+			(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+			"programming project");
+		long id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+			.findFirst().get().getId();
 
 		final WebApiResponse response = client.loadById(id);
 
@@ -72,19 +73,20 @@ public class TestYourApi
 		assertEquals("Prof.", supervisorViewBraun.getTitle());
 		assertEquals("peter.braun@fhws.de", supervisorViewBraun.getEmail());
 
-		client.deleteProject(project.getId());
+		assertEquals(204, client.deleteProject(project.getId()).getLastStatusCode());
 	}
 
 	@Test public void load_all_projects() throws IOException
 	{
 		final WebApiClient client = new WebApiClient();
 		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
-				(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
-				(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
-				"programming project");
-		long project1Id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
-		long project2Id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
-		//TODO: überlegen, ob es eine sinvollere Struktur gibt
+			(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
+			(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+			"programming project");
+		long project1Id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+			.findFirst().get().getId();
+		long project2Id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+			.findFirst().get().getId();
 
 		final WebApiResponse response = client.loadAllProjects();
 		assertEquals(200, response.getLastStatusCode());
@@ -116,38 +118,44 @@ public class TestYourApi
 		assertEquals("Prof.", supervisorViewBraun.getTitle());
 		assertEquals("peter.braun@fhws.de", supervisorViewBraun.getEmail());
 
-		client.deleteProject(project1Id);
-		client.deleteProject(project2Id);
+		assertEquals(204, client.deleteProject(project1Id).getLastStatusCode());
+		assertEquals(204, client.deleteProject(project2Id).getLastStatusCode());
 	}
 
 	@Test public void load_all_projects_By_Name_Semster_Type() throws IOException
 	{
 		final WebApiClient client = new WebApiClient();
-		long project1Id = client.loadByURL(client.postProject(new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
-				(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
-				(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
-				"duplicateTypeForTesting")).getLocation()).getResponseData().stream().findFirst().get().getId();
+		long project1Id = client.loadByURL(client.postProject(
+				new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
+					(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
+					(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
+					"2022ss", "duplicateTypeForTesting")).getLocation()).getResponseData().stream().findFirst().get()
+			.getId();
 
-		long project2Id = client.loadByURL(client.postProject(new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
+		long project2Id = client.loadByURL(client.postProject(
+			new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
 				(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
-				(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "0000ss",
-				"programming project")).getLocation()).getResponseData().stream().findFirst().get().getId();
+				(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
+				"0000ss", "programming project")).getLocation()).getResponseData().stream().findFirst().get().getId();
 
-		long project3Id = client.loadByURL(client.postProject(new ProjectView("template", "we try to create an API for projects",
-				(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
-				(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "0000ss",
-				"duplicateTypeForTesting")).getLocation()).getResponseData().stream().findFirst().get().getId();
-		//TODO: überlegen, ob es eine sinvollere Struktur gibt
+		long project3Id = client.loadByURL(client.postProject(
+				new ProjectView("template", "we try to create an API for projects",
+					(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
+					(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
+					"0000ss", "duplicateTypeForTesting")).getLocation()).getResponseData().stream().findFirst().get()
+			.getId();
 
-		final WebApiResponse responseName = client.loadAllProjectsByNameTypeAndSemester("duplicateNameForTesting","","");
+		final WebApiResponse responseName = client.loadAllProjectsByNameTypeAndSemester("duplicateNameForTesting", "",
+			"");
 		assertEquals(200, responseName.getLastStatusCode());
 		assertEquals(2, responseName.getResponseData().size());
 
-		final WebApiResponse responseType = client.loadAllProjectsByNameTypeAndSemester("duplicateNameForTesting","","");
+		final WebApiResponse responseType = client.loadAllProjectsByNameTypeAndSemester("", "duplicateTypeForTesting",
+			"");
 		assertEquals(200, responseType.getLastStatusCode());
 		assertEquals(2, responseType.getResponseData().size());
 
-		final WebApiResponse responseSemester = client.loadAllProjectsByNameTypeAndSemester("duplicateNameForTesting","","");
+		final WebApiResponse responseSemester = client.loadAllProjectsByNameTypeAndSemester("", "", "0000ss");
 		assertEquals(200, responseSemester.getLastStatusCode());
 		assertEquals(2, responseSemester.getResponseData().size());
 
@@ -156,108 +164,498 @@ public class TestYourApi
 		assertEquals(204, client.deleteProject(project3Id).getLastStatusCode());
 	}
 
-	@Test public void post_project() throws IOException
+	@Test public void wrong_input_on_get_status400()
 	{
-		ProjectView projectPost = new ProjectView("testProject", "", Arrays.asList(new StudentView("Paul", "Nummer", "BEC", 2)), Arrays.asList(new SupervisorView("Steffen", "Heinzl", "Prof", "steffen.heinzl@fhws.de")), "1999ws", "type");
 		final WebApiClient client = new WebApiClient();
-		WebApiResponse responsePost = client.postProject(projectPost);
-		assertEquals(201, responsePost.getLastStatusCode());
-		String location = responsePost.getLocation();
-		WebApiResponse responseGet = client.loadByURL(location);
+		long project1Id = 0;
+		try
+		{
+			project1Id = client.loadByURL(client.postProject(
+					new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
+						(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
+						(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
+						"2022ss", "duplicateTypeForTesting")).getLocation()).getResponseData().stream().findFirst().get()
+				.getId();
 
-		final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
-		assertTrue(result.isPresent());
-		final ProjectView projectGet = result.get();
+			long project2Id = client.loadByURL(client.postProject(
+					new ProjectView("duplicateNameForTesting", "we try to create an API for projects",
+						(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
+						(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
+						"0000ss", "programming project")).getLocation()).getResponseData().stream().findFirst().get()
+				.getId();
 
-		assertEquals("testProject", projectGet.getName());
-		assertEquals("type", projectGet.getType());
-		assertEquals("1999ws", projectGet.getSemester());
+			long project3Id = client.loadByURL(client.postProject(
+					new ProjectView("template", "we try to create an API for projects",
+						(Collections.singletonList(new StudentView("Julian", "Sehne", "BIN", 4))),
+						(Collections.singletonList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))),
+						"0000ss", "duplicateTypeForTesting")).getLocation()).getResponseData().stream().findFirst().get()
+				.getId();
 
-		Optional<StudentView> studentView = projectGet.getStudents().stream().findFirst();
-		assertTrue(studentView.isPresent());
-		StudentView studentViewJulian = studentView.get();
+			assertEquals(400, client.loadAllProjectsByNameTypeAndSemester("", "", "0000sw").getLastStatusCode());
+			assertEquals(400, client.loadAllProjectsByNameTypeAndSemester("", "", "a000ss").getLastStatusCode());
+			assertEquals(400, client.loadAllProjectsByNameTypeAndSemester("", "", "0000SW").getLastStatusCode());
+			assertEquals(400, client.loadAllProjectsByNameTypeAndSemester("", "", "0000SS").getLastStatusCode());
+			assertEquals(400, client.loadAllProjectsByNameTypeAndSemester("", "", "20ss").getLastStatusCode());
 
-		assertEquals("Paul", studentViewJulian.getFirstName());
-		assertEquals("Nummer", studentViewJulian.getLastName());
-		assertEquals("BEC", studentViewJulian.getCourse());
-		assertEquals(2, studentViewJulian.getSemester());
-
-		Optional<SupervisorView> superVisorView = projectGet.getSupervisors().stream().findFirst();
-		assertTrue(superVisorView.isPresent());
-		SupervisorView superVisorViewPresent = superVisorView.get();
-
-		assertEquals("Steffen", superVisorViewPresent.getFirstName());
-		assertEquals("Heinzl", superVisorViewPresent.getLastName());
-		assertEquals("Prof", superVisorViewPresent.getTitle());
-		assertEquals("steffen.heinzl@fhws.de", superVisorViewPresent.getEmail());
-
-		client.deleteProject(projectGet.getId());
+			assertEquals(204, client.deleteProject(project1Id).getLastStatusCode());
+			assertEquals(204, client.deleteProject(project2Id).getLastStatusCode());
+			assertEquals(204, client.deleteProject(project3Id).getLastStatusCode());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
-	@Test public void delete_project() throws IOException
+	@Test public void load_project_by_id_status404()
 	{
 		final WebApiClient client = new WebApiClient();
 		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
-				(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
-				(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
-				"programming project");
-		long id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
+			(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
+			(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+			"programming project");
+		long id = 0;
+		try
+		{
+			id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+				.findFirst().get().getId();
+			final WebApiResponse response = client.loadById(0L);
+			assertEquals(404, response.getLastStatusCode());
+			assertEquals(204, client.deleteProject(id).getLastStatusCode());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 
-		final WebApiResponse response = client.deleteProject(id);
-		assertEquals(204, response.getLastStatusCode());
 	}
 
-	@Test public void put_project() throws IOException
+	//POST
+	@Test public void post_project()
+	{
+		ProjectView projectPost = new ProjectView("testProject", "",
+			Arrays.asList(new StudentView("Paul", "Nummer", "BEC", 2)),
+			Arrays.asList(new SupervisorView("Steffen", "Heinzl", "Prof", "steffen.heinzl@fhws.de")), "1999ws", "type");
+		final WebApiClient client = new WebApiClient();
+		WebApiResponse responsePost = null;
+		try
+		{
+			responsePost = client.postProject(projectPost);
+			assertEquals(201, responsePost.getLastStatusCode());
+			String location = responsePost.getLocation();
+			WebApiResponse responseGet = client.loadByURL(location);
+
+			final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
+			assertTrue(result.isPresent());
+			final ProjectView projectGet = result.get();
+
+			assertEquals("testProject", projectGet.getName());
+			assertEquals("type", projectGet.getType());
+			assertEquals("1999ws", projectGet.getSemester());
+
+			Optional<StudentView> studentView = projectGet.getStudents().stream().findFirst();
+			assertTrue(studentView.isPresent());
+			StudentView studentViewJulian = studentView.get();
+
+			assertEquals("Paul", studentViewJulian.getFirstName());
+			assertEquals("Nummer", studentViewJulian.getLastName());
+			assertEquals("BEC", studentViewJulian.getCourse());
+			assertEquals(2, studentViewJulian.getSemester());
+
+			Optional<SupervisorView> superVisorView = projectGet.getSupervisors().stream().findFirst();
+			assertTrue(superVisorView.isPresent());
+			SupervisorView superVisorViewPresent = superVisorView.get();
+
+			assertEquals("Steffen", superVisorViewPresent.getFirstName());
+			assertEquals("Heinzl", superVisorViewPresent.getLastName());
+			assertEquals("Prof", superVisorViewPresent.getTitle());
+			assertEquals("steffen.heinzl@fhws.de", superVisorViewPresent.getEmail());
+
+			assertEquals(204, client.deleteProject(projectGet.getId()).getLastStatusCode());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	@Test public void post_project_status400()
+	{
+		ProjectView correctProject = new ProjectView("testProject", "",
+			Arrays.asList(new StudentView("Paul", "Nummer", "BEC", 2)),
+			Arrays.asList(new SupervisorView("Steffen", "Heinzl", "Prof", "steffen.heinzl@fhws.de")), "1999ws", "type");
+		final WebApiClient client = new WebApiClient();
+		WebApiResponse responsePost = null;
+		try
+		{
+			responsePost = client.postProject(correctProject);
+			//Verify this Project is postable
+			assertEquals(201, responsePost.getLastStatusCode());
+			String location = responsePost.getLocation();
+			WebApiResponse responseGet = client.loadByURL(location);
+			final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
+			assertTrue(result.isPresent());
+			final ProjectView projectGet = result.get();
+			assertEquals(204, client.deleteProject(projectGet.getId()).getLastStatusCode());
+
+			//verify these changes make it unpostable
+			ProjectView incorrectProject = correctProject;
+
+			incorrectProject.setSemester("20ss");
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setSemester(projectGet.getSemester());
+
+			incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(8));//only 1-7 allowed
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setStudents(projectGet.getStudents());
+
+			incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(0));//only 1-7 allowed
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setStudents(projectGet.getStudents());
+
+			incorrectProject.getStudents()
+				.forEach(studentView -> studentView.setCourse("bab"));//only 3 capital letters allowed
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setStudents(projectGet.getStudents());
+
+			incorrectProject.getStudents()
+				.forEach(studentView -> studentView.setCourse("EINI"));//only 3 capital letters allowed
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setStudents(projectGet.getStudents());
+
+			incorrectProject.getSupervisors()
+				.forEach(supervisorView -> supervisorView.setEmail("wrongEmail.de")); //'@' and '.' are mandatory
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setSupervisors(projectGet.getSupervisors());
+
+			incorrectProject.getSupervisors()
+				.forEach(supervisorView -> supervisorView.setEmail("w@de")); //'@' and '.' are mandatory
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setSupervisors(projectGet.getSupervisors());
+
+			incorrectProject.getSupervisors()
+				.forEach(supervisorView -> supervisorView.setEmail("w@.de")); //'@' and '.' are mandatory
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setSupervisors(projectGet.getSupervisors());
+
+			incorrectProject.getSupervisors()
+				.forEach(supervisorView -> supervisorView.setEmail("@s.de")); //'@' and '.' are mandatory
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setSupervisors(projectGet.getSupervisors());
+
+			incorrectProject.getSupervisors()
+				.forEach(supervisorView -> supervisorView.setEmail("w@s.")); //'@' and '.' are mandatory
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setSupervisors(projectGet.getSupervisors());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	//DELETE
+	@Test public void delete_project()
 	{
 		final WebApiClient client = new WebApiClient();
 		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
-				(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
-				(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
-				"programming project");
-		long projectId = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream().findFirst().get().getId();
+			(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
+			(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+			"programming project");
+		long id = 0;
+		try
+		{
+			id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+				.findFirst().get().getId();
+			final WebApiResponse response = client.deleteProject(id);
+			assertEquals(204, response.getLastStatusCode());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 
-		ProjectView projectViewPut = new ProjectView("newName", "newDescription",
+	}
+
+	@Test public void delete_project_status404()
+	{
+		final WebApiClient client = new WebApiClient();
+		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
+			(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
+			(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+			"programming project");
+		projectViewPost.setId(187);
+		long id = 0;
+		try
+		{
+			id = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+				.findFirst().get().getId();
+			final WebApiResponse response = client.deleteProject(0L);
+			assertEquals(404, response.getLastStatusCode());
+			assertEquals(204, client.deleteProject(id).getLastStatusCode());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	//PUT
+	@Test public void put_project_status204()
+	{
+		final WebApiClient client = new WebApiClient();
+		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
+			(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
+			(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+			"programming project");
+		long projectId = 0;
+		try
+		{
+			projectId = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+				.findFirst().get().getId();
+			ProjectView projectViewPut = new ProjectView("newName", "newDescription",
+				(Arrays.asList(new StudentView("newStudentName", "newStudentLastName", "BAB", 7))), (Arrays.asList(
+				new SupervisorView("newSupervisorName", "newSupervisorLastName", "newTitle", "newEmail@test.de"))),
+				"0000ss", "newType");
+
+			projectViewPut.setId(projectId);
+
+			final WebApiResponse responsePut = client.putProject(projectViewPut, projectId);
+			assertEquals(204, responsePut.getLastStatusCode());
+
+			WebApiResponse responseGet = client.loadById(projectId);
+
+			final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
+			assertTrue(result.isPresent());
+			final ProjectView projectGet = result.get();
+
+			assertEquals("newName", projectGet.getName());
+			assertEquals("newType", projectGet.getType());
+			assertEquals("0000ss", projectGet.getSemester());
+
+			Optional<StudentView> studentView = projectGet.getStudents().stream().findFirst();
+			assertTrue(studentView.isPresent());
+			StudentView studentViewJulian = studentView.get();
+
+			assertEquals("newStudentName", studentViewJulian.getFirstName());
+			assertEquals("newStudentLastName", studentViewJulian.getLastName());
+			assertEquals("BAB", studentViewJulian.getCourse());
+			assertEquals(7, studentViewJulian.getSemester());
+
+			Optional<SupervisorView> superVisorView = projectGet.getSupervisors().stream().findFirst();
+			assertTrue(superVisorView.isPresent());
+			SupervisorView superVisorViewPresent = superVisorView.get();
+
+			assertEquals("newSupervisorName", superVisorViewPresent.getFirstName());
+			assertEquals("newSupervisorLastName", superVisorViewPresent.getLastName());
+			assertEquals("newTitle", superVisorViewPresent.getTitle());
+			assertEquals("newEmail@test.de", superVisorViewPresent.getEmail());
+
+			assertEquals(204, client.deleteProject(projectGet.getId()).getLastStatusCode());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test public void put_project_status404()
+	{
+		final WebApiClient client = new WebApiClient();
+		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
+			(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
+			(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+			"programming project");
+		long projectId = 0;
+		try
+		{
+			projectId = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+				.findFirst().get().getId();
+			ProjectView projectViewPut = new ProjectView("newName", "newDescription",
 				(Arrays.asList(new StudentView("newStudentName", "newStudentLastName", "newCourse", 7))),
-				(Arrays.asList(new SupervisorView("newSupervisorName", "newSupervisorLastName", "newTitle", "newEmail"))), "newSemester",
-				"newType");
+				(Arrays.asList(
+					new SupervisorView("newSupervisorName", "newSupervisorLastName", "newTitle", "newEmail"))),
+				"newSemester", "newType");
 
-		projectViewPut.setId(projectId);
+			projectViewPut.setId(0L);
 
-		final WebApiResponse responsePut = client.putProject(projectViewPut, projectId);
-		assertEquals(204, responsePut.getLastStatusCode());
+			final WebApiResponse responsePut = client.putProject(projectViewPut, 0L);
+			assertEquals(404, responsePut.getLastStatusCode());
 
-		WebApiResponse responseGet = client.loadById(projectId);
-		final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
-		assertTrue(result.isPresent());
-		final ProjectView projectGet = result.get();
+			WebApiResponse responseGet = client.loadById(projectId);
 
-		assertEquals("newName", projectGet.getName());
-		assertEquals("newType", projectGet.getType());
-		assertEquals("newSemester", projectGet.getSemester());
+			final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
+			assertTrue(result.isPresent());
+			final ProjectView projectGet = result.get();
 
-		Optional<StudentView> studentView = projectGet.getStudents().stream().findFirst();
-		assertTrue(studentView.isPresent());
-		StudentView studentViewJulian = studentView.get();
+			assertEquals("template", projectGet.getName());
+			assertEquals("programming project", projectGet.getType());
+			assertEquals("2022ss", projectGet.getSemester());
 
-		assertEquals("newStudentName", studentViewJulian.getFirstName());
-		assertEquals("newStudentLastName", studentViewJulian.getLastName());
-		assertEquals("newCourse", studentViewJulian.getCourse());
-		assertEquals(7, studentViewJulian.getSemester());
+			Optional<StudentView> studentView = projectGet.getStudents().stream().findFirst();
+			assertTrue(studentView.isPresent());
+			StudentView studentViewJulian = studentView.get();
 
-		Optional<SupervisorView> superVisorView = projectGet.getSupervisors().stream().findFirst();
-		assertTrue(superVisorView.isPresent());
-		SupervisorView superVisorViewPresent = superVisorView.get();
+			assertEquals("Julian", studentViewJulian.getFirstName());
+			assertEquals("Sehne", studentViewJulian.getLastName());
+			assertEquals("BIN", studentViewJulian.getCourse());
+			assertEquals(4, studentViewJulian.getSemester());
 
-		assertEquals("newSupervisorName", superVisorViewPresent.getFirstName());
-		assertEquals("newSupervisorLastName", superVisorViewPresent.getLastName());
-		assertEquals("newTitle", superVisorViewPresent.getTitle());
-		assertEquals("newEmail", superVisorViewPresent.getEmail());
+			Optional<SupervisorView> superVisorView = projectGet.getSupervisors().stream().findFirst();
+			assertTrue(superVisorView.isPresent());
+			SupervisorView superVisorViewPresent = superVisorView.get();
 
-		client.deleteProject(projectGet.getId());
+			assertEquals("Peter", superVisorViewPresent.getFirstName());
+			assertEquals("Braun", superVisorViewPresent.getLastName());
+			assertEquals("Prof.", superVisorViewPresent.getTitle());
+			assertEquals("peter.braun@fhws.de", superVisorViewPresent.getEmail());
+
+			assertEquals(204, client.deleteProject(projectGet.getId()).getLastStatusCode());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 
 	}
 
+	@Test public void put_project_status400()
+	{
+		final WebApiClient client = new WebApiClient();
+		ProjectView projectViewPost = new ProjectView("template", "we try to create an API for projects",
+			(Arrays.asList(new StudentView("Julian", "Sehne", "BIN", 4))),
+			(Arrays.asList(new SupervisorView("Peter", "Braun", "Prof.", "peter.braun@fhws.de"))), "2022ss",
+			"programming project");
+		long projectId = 0;
+		try
+		{
+			projectId = client.loadByURL(client.postProject(projectViewPost).getLocation()).getResponseData().stream()
+				.findFirst().get().getId();
+			ProjectView incorrectProject = new ProjectView("newName", "newDescription",
+				(Arrays.asList(new StudentView("newStudentName", "newStudentLastName", "newCourse", 7))),
+				(Arrays.asList(
+					new SupervisorView("newSupervisorName", "newSupervisorLastName", "newTitle", "newEmail"))),
+				"newSemester", "newType");
 
+			incorrectProject.setId(20);
 
-	//TODO: all four CRUD operations
+			WebApiResponse responsePut = client.putProject(incorrectProject, 1L);
+			assertEquals(400, responsePut.getLastStatusCode());
+
+			WebApiResponse responseGet = client.loadById(projectId);
+			{
+				final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
+				assertTrue(result.isPresent());
+				final ProjectView projectGet = result.get();
+
+				//verify these changes make it unpostable
+				incorrectProject.setSemester("20ss");
+				responsePut = client.putProject(incorrectProject, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				incorrectProject.setSemester(projectGet.getSemester());
+
+				incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(8));//only 1-7 allowed
+				responsePut = client.putProject(incorrectProject, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				final int semester = projectGet.getStudents().stream().findFirst().get().getSemester();
+				incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(semester));
+
+				incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(0));//only 1-7 allowed
+				responsePut = client.putProject(incorrectProject, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				final String course = projectGet.getStudents().stream().findFirst().get().getCourse();
+				incorrectProject.getStudents().forEach(studentView -> studentView.setCourse(course));
+
+				incorrectProject.getStudents()
+					.forEach(studentView -> studentView.setCourse("bab"));//only 3 capital letters allowed
+				responsePut = client.putProject(incorrectProject, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				incorrectProject.getStudents().forEach(studentView -> studentView.setCourse(course));
+
+				incorrectProject.getStudents()
+					.forEach(studentView -> studentView.setCourse("EINI"));//only 3 capital letters allowed
+				responsePut = client.putProject(incorrectProject, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				incorrectProject.getStudents().forEach(studentView -> studentView.setCourse(course));
+
+				incorrectProject.getSupervisors()
+					.forEach(supervisorView -> supervisorView.setEmail("wrongEmail.de")); //'@' and '.' are mandatory
+				responsePut = client.putProject(incorrectProject, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				final String email = projectGet.getSupervisors().stream().findFirst().get().getEmail();
+				incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+
+				incorrectProject.getSupervisors()
+					.forEach(supervisorView -> supervisorView.setEmail("a@ae")); //'@' and '.' are mandatory
+				responsePut = client.putProject(incorrectProject, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+
+				incorrectProject.getSupervisors()
+					.forEach(supervisorView -> supervisorView.setEmail("z@.uu")); //'@' and '.' are mandatory
+				responsePut = client.putProject(incorrectProject, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+
+				incorrectProject.getSupervisors()
+					.forEach(supervisorView -> supervisorView.setEmail("@t.de")); //'@' and '.' are mandatory
+				responsePut = client.putProject(incorrectProject, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+
+				incorrectProject.getSupervisors()
+					.forEach(supervisorView -> supervisorView.setEmail("b@bb.")); //'@' and '.' are mandatory
+				responsePut = client.putProject(incorrectProject, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+			}
+			{
+				final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
+				assertTrue(result.isPresent());
+				final ProjectView projectGet = result.get();
+
+				assertEquals("template", projectGet.getName());
+				assertEquals("programming project", projectGet.getType());
+				assertEquals("2022ss", projectGet.getSemester());
+
+				Optional<StudentView> studentView = projectGet.getStudents().stream().findFirst();
+				assertTrue(studentView.isPresent());
+				StudentView studentViewJulian = studentView.get();
+
+				assertEquals("Julian", studentViewJulian.getFirstName());
+				assertEquals("Sehne", studentViewJulian.getLastName());
+				assertEquals("BIN", studentViewJulian.getCourse());
+				assertEquals(4, studentViewJulian.getSemester());
+
+				Optional<SupervisorView> superVisorView = projectGet.getSupervisors().stream().findFirst();
+				assertTrue(superVisorView.isPresent());
+				SupervisorView superVisorViewPresent = superVisorView.get();
+
+				assertEquals("Peter", superVisorViewPresent.getFirstName());
+				assertEquals("Braun", superVisorViewPresent.getLastName());
+				assertEquals("Prof.", superVisorViewPresent.getTitle());
+				assertEquals("peter.braun@fhws.de", superVisorViewPresent.getEmail());
+
+				assertEquals(204, client.deleteProject(projectGet.getId()).getLastStatusCode());
+			}
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
 }
