@@ -90,7 +90,6 @@ public class TestServlet
 
 		final WebApiResponse response = client.loadAllProjects();
 		assertEquals(200, response.getLastStatusCode());
-		assertEquals(2, response.getResponseData().size());
 
 		final Collection<ProjectView> result = response.getResponseData();
 		assertTrue(!result.isEmpty());
