@@ -117,12 +117,12 @@ public class ProjectStorage
 	private boolean isValidSemester(String semester)
 	{
 		return matchRegex(semester, "(^[0-9][0-9][0-9][0-9](w|s)s$|^$)");
-	}
+	}//<Number><Number><Number><Number><s or w><s>
 
 	private boolean isValidEmail(String semester)
 	{
 		return matchRegex(semester, "(^.+@.+\\..+$|^$)");
-	}
+	} //<text><@><text><.><text>
 
 	private boolean isValidSemesterNumber(int semesterNumber)
 	{
@@ -131,7 +131,7 @@ public class ProjectStorage
 
 	private boolean isValidCourse(String semester)
 	{
-		return matchRegex(semester, "[A-Z][A-Z][A-Z]");
+		return matchRegex(semester, "^([A-Z]|[a-z])([A-Z]|[a-z])([A-Z]|[a-z])$"); //3 characters ignore case allowed
 	}
 
 	private boolean isValidSupervisors(Collection<Supervisor> supervisors)
@@ -163,6 +163,6 @@ public class ProjectStorage
 	public static void main(String[] args)
 	{
 		ProjectStorage projectStorage = new ProjectStorage();
-		System.out.println(projectStorage.matchRegex("f@f1", "(^.+@.+\\..+$|^$)"));
+		System.out.println(projectStorage.matchRegex("iin", "^([A-Z]|[a-z])([A-Z]|[a-z])([A-Z]|[a-z])$"));
 	}
 }
