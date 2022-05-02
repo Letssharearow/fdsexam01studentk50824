@@ -39,7 +39,7 @@ public class Student extends Person
 
 	@Override public String toString()
 	{
-		return "Student{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\''
+		return "Student{" + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\''
 			+ ", course='" + course + '\'' + ", semester=" + semester + '}';
 	}
 }

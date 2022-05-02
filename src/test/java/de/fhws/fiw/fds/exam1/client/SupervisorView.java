@@ -39,7 +39,7 @@ public class SupervisorView extends PersonView
 
 	@Override public String toString()
 	{
-		return "Supervisor{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\''
-			+ ", title='" + title + '\'' + ", email='" + email + '\'' + '}';
+		return "Supervisor{" + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\''
+				+ ", title='" + title + '\'' + ", email='" + email + '\'' + '}';
 	}
 }

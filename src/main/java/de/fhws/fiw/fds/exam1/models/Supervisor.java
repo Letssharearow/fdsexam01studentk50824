@@ -39,7 +39,7 @@ public class Supervisor extends Person
 
 	@Override public String toString()
 	{
-		return "Supervisor{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\''
+		return "Supervisor{" + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\''
 			+ ", title='" + title + '\'' + ", email='" + email + '\'' + '}';
 	}
 }

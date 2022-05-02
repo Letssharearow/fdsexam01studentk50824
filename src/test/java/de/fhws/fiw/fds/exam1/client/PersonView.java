@@ -2,7 +2,6 @@ package de.fhws.fiw.fds.exam1.client;
 
 public class PersonView
 {
-	protected long id;
 	protected String firstName;
 	protected String lastName;
 
@@ -14,16 +13,6 @@ public class PersonView
 	{
 		this.firstName = firstname;
 		this.lastName = lastname;
-	}
-
-	public long getId()
-	{
-		return id;
-	}
-
-	public void setId(final long id)
-	{
-		this.id = id;
 	}
 
 	public String getFirstName()
@@ -48,6 +37,6 @@ public class PersonView
 
 	@Override public String toString()
 	{
-		return "Person{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '}';
+		return "Person{" + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '}';
 	}
 }
