@@ -64,18 +64,16 @@ public class ProjectStorage
 
 	private void verifyProject(Project project) throws IllegalArgumentException
 	{
+		if (!isValidName(project.getName()))
+		{
+			throw new IllegalArgumentException("invalid project name");
+		}
 		if (!isValidSemester(project.getSemester()))
 		{
 			throw new IllegalArgumentException("invalid project semester");
 		}
-		if (!isValidStudents(project.getStudents()))
-		{
-			throw new IllegalArgumentException("invalid students");
-		}
-		if (!isValidSupervisors(project.getSupervisors()))
-		{
-			throw new IllegalArgumentException("invalid supervisors");
-		}
+		verifyStudents(project.getStudents());
+		verifySupervisors(project.getSupervisors());
 	}
 
 	public void delete(final Project project)
@@ -114,6 +112,11 @@ public class ProjectStorage
 		return matcher.find();
 	}
 
+	private boolean isValidName(String name)
+	{
+		return !name.isEmpty();
+	}
+
 	private boolean isValidSemester(String semester)
 	{
 		return matchRegex(semester, "(^[0-9][0-9][0-9][0-9](w|s)s$|^$)");
@@ -134,15 +137,28 @@ public class ProjectStorage
 		return matchRegex(semester, "^([A-Z]|[a-z])([A-Z]|[a-z])([A-Z]|[a-z])$"); //3 characters ignore case allowed
 	}
 
-	private boolean isValidSupervisors(Collection<Supervisor> supervisors)
+	private void verifySupervisors(Collection<Supervisor> supervisors) throws IllegalArgumentException
 	{
-		return supervisors.stream().anyMatch(supervisor -> isValidEmail(supervisor.getEmail()));
+		supervisors.forEach(supervisor -> {
+			if (!isValidEmail(supervisor.getEmail()))
+			{
+				throw new IllegalArgumentException("invalid email");
+			}
+		});
 	}
 
-	private boolean isValidStudents(Collection<Student> students)
+	private void verifyStudents(Collection<Student> students) throws IllegalArgumentException
 	{
-		return students.stream()
-			.anyMatch(student -> isValidSemesterNumber(student.getSemester()) && isValidCourse(student.getCourse()));
+		students.forEach(student -> {
+			if (!isValidCourse(student.getCourse()))
+			{
+				throw new IllegalArgumentException("invalid CourseName");
+			}
+			else if (!isValidSemesterNumber(student.getSemester()))
+			{
+				throw new IllegalArgumentException("invalid SemesterNumer");
+			}
+		});
 	}
 
 	private boolean byName(final Project project, final String name)
@@ -163,6 +179,6 @@ public class ProjectStorage
 	public static void main(String[] args)
 	{
 		ProjectStorage projectStorage = new ProjectStorage();
-		System.out.println(projectStorage.matchRegex("iin", "^([A-Z]|[a-z])([A-Z]|[a-z])([A-Z]|[a-z])$"));
+		System.out.println(projectStorage.matchRegex("BIN", "^([A-Z]|[a-z])([A-Z]|[a-z])([A-Z]|[a-z])$"));
 	}
 }

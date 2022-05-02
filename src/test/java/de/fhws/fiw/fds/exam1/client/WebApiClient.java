@@ -83,6 +83,12 @@ public class WebApiClient
 		return new WebApiResponse(response.code());
 	}
 
+	public WebApiResponse deleteProjectByURL(String location) throws IOException
+	{
+		final Response response = sendDeleteRequestByURL(location);
+		return new WebApiResponse(response.code());
+	}
+
 	private Response sendGetRequest(final String url) throws IOException
 	{
 		final Request request = new Request.Builder().url(url).get().build();
@@ -105,6 +111,11 @@ public class WebApiClient
 	private Response sendDeleteRequest(final long id) throws IOException
 	{
 		String url = getURLFromId(id);
+		return sendDeleteRequestByURL(url);
+	}
+
+	private Response sendDeleteRequestByURL(final String url) throws IOException
+	{
 		final Request request = new Request.Builder().url(url).delete().build();
 		return this.client.newCall(request).execute();
 	}

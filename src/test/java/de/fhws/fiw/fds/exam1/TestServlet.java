@@ -287,9 +287,10 @@ public class TestServlet
 		WebApiResponse responsePost = null;
 		try
 		{
-			responsePost = client.postProject(correctProject);
 			//Verify this Project is postable
+			responsePost = client.postProject(correctProject);
 			assertEquals(201, responsePost.getLastStatusCode());
+
 			String location = responsePost.getLocation();
 			WebApiResponse responseGet = client.loadProjectByURL(location);
 			final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
@@ -300,62 +301,134 @@ public class TestServlet
 			//verify these changes make it unpostable
 			ProjectView incorrectProject = correctProject;
 
+			incorrectProject.setName("");
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setName(projectGet.getName());
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
+
 			incorrectProject.setSemester("20ss");
 			responsePost = client.postProject(incorrectProject);
 			assertEquals(400, responsePost.getLastStatusCode());
 			incorrectProject.setSemester(projectGet.getSemester());
 
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
+
+			incorrectProject.setSemester("2022sw");
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setSemester(projectGet.getSemester());
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
+
+			incorrectProject.setSemester("2022ww");
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(400, responsePost.getLastStatusCode());
+			incorrectProject.setSemester(projectGet.getSemester());
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
+
+			final int semester = projectGet.getStudents().stream().findFirst().get().getSemester();
 			incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(8));//only 1-7 allowed
 			responsePost = client.postProject(incorrectProject);
 			assertEquals(400, responsePost.getLastStatusCode());
-			incorrectProject.setStudents(projectGet.getStudents());
+			incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(semester));
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
 
 			incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(0));//only 1-7 allowed
 			responsePost = client.postProject(incorrectProject);
 			assertEquals(400, responsePost.getLastStatusCode());
-			incorrectProject.setStudents(projectGet.getStudents());
+			incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(semester));
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
+
+			final String course = projectGet.getStudents().stream().findFirst().get().getCourse();
 
 			incorrectProject.getStudents()
-				.forEach(studentView -> studentView.setCourse("bab"));//only 3 capital letters allowed
+				.forEach(studentView -> studentView.setCourse("babi"));//only 3 capital letters allowed
 			responsePost = client.postProject(incorrectProject);
 			assertEquals(400, responsePost.getLastStatusCode());
-			incorrectProject.setStudents(projectGet.getStudents());
+			incorrectProject.getStudents().forEach(studentView -> studentView.setCourse(course));
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
 
 			incorrectProject.getStudents()
 				.forEach(studentView -> studentView.setCourse("EINI"));//only 3 capital letters allowed
 			responsePost = client.postProject(incorrectProject);
 			assertEquals(400, responsePost.getLastStatusCode());
-			incorrectProject.setStudents(projectGet.getStudents());
+			incorrectProject.getStudents().forEach(studentView -> studentView.setCourse(course));
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
 
 			incorrectProject.getSupervisors()
 				.forEach(supervisorView -> supervisorView.setEmail("wrongEmail.de")); //'@' and '.' are mandatory
 			responsePost = client.postProject(incorrectProject);
 			assertEquals(400, responsePost.getLastStatusCode());
-			incorrectProject.setSupervisors(projectGet.getSupervisors());
+			final String email = projectGet.getSupervisors().stream().findFirst().get().getEmail();
+			incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
 
 			incorrectProject.getSupervisors()
-				.forEach(supervisorView -> supervisorView.setEmail("w@de")); //'@' and '.' are mandatory
+				.forEach(supervisorView -> supervisorView.setEmail("a@ae")); //'@' and '.' are mandatory
 			responsePost = client.postProject(incorrectProject);
 			assertEquals(400, responsePost.getLastStatusCode());
-			incorrectProject.setSupervisors(projectGet.getSupervisors());
+			incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
 
 			incorrectProject.getSupervisors()
-				.forEach(supervisorView -> supervisorView.setEmail("w@.de")); //'@' and '.' are mandatory
+				.forEach(supervisorView -> supervisorView.setEmail("z@.uu")); //'@' and '.' are mandatory
 			responsePost = client.postProject(incorrectProject);
 			assertEquals(400, responsePost.getLastStatusCode());
-			incorrectProject.setSupervisors(projectGet.getSupervisors());
+			incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
 
 			incorrectProject.getSupervisors()
-				.forEach(supervisorView -> supervisorView.setEmail("@s.de")); //'@' and '.' are mandatory
+				.forEach(supervisorView -> supervisorView.setEmail("@t.de")); //'@' and '.' are mandatory
 			responsePost = client.postProject(incorrectProject);
 			assertEquals(400, responsePost.getLastStatusCode());
-			incorrectProject.setSupervisors(projectGet.getSupervisors());
+			incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
 
 			incorrectProject.getSupervisors()
-				.forEach(supervisorView -> supervisorView.setEmail("w@s.")); //'@' and '.' are mandatory
+				.forEach(supervisorView -> supervisorView.setEmail("b@bb.")); //'@' and '.' are mandatory
 			responsePost = client.postProject(incorrectProject);
 			assertEquals(400, responsePost.getLastStatusCode());
-			incorrectProject.setSupervisors(projectGet.getSupervisors());
+			incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+
+			responsePost = client.postProject(incorrectProject);
+			assertEquals(201, responsePost.getLastStatusCode());
+			assertEquals(204, client.deleteProjectByURL(responsePost.getLocation()).getLastStatusCode());
+
 		}
 		catch (IOException e)
 		{
@@ -543,16 +616,15 @@ public class TestServlet
 		{
 			projectId = client.loadProjectByURL(client.postProject(projectViewPost).getLocation()).getResponseData()
 				.stream().findFirst().get().getId();
-			ProjectView incorrectProject = new ProjectView("newName", "newDescription",
-				(Arrays.asList(new StudentView("newStudentName", "newStudentLastName", "newCourse", 7))),
-				(Arrays.asList(
-					new SupervisorView("newSupervisorName", "newSupervisorLastName", "newTitle", "newEmail"))),
-				"newSemester", "newType");
 
-			incorrectProject.setId(20);
+			projectViewPost.setId(20);
 
-			WebApiResponse responsePut = client.putProject(incorrectProject, 1L);
+			WebApiResponse responsePut = client.putProject(projectViewPost, 1L);
 			assertEquals(400, responsePut.getLastStatusCode());
+			projectViewPost.setId(projectId);
+
+			responsePut = client.putProject(projectViewPost, projectId);
+			assertEquals(204, responsePut.getLastStatusCode());
 
 			WebApiResponse responseGet = client.loadProjectById(projectId);
 			{
@@ -560,66 +632,122 @@ public class TestServlet
 				assertTrue(result.isPresent());
 				final ProjectView projectGet = result.get();
 
-				//verify these changes make it unpostable
-				incorrectProject.setSemester("20ss");
-				responsePut = client.putProject(incorrectProject, projectId);
+				//verify these changes make it unputtable
+				projectViewPost.setName("");
+				responsePut = client.putProject(projectViewPost, projectId);
 				assertEquals(400, responsePut.getLastStatusCode());
-				incorrectProject.setSemester(projectGet.getSemester());
+				projectViewPost.setName(projectGet.getName());
 
-				incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(8));//only 1-7 allowed
-				responsePut = client.putProject(incorrectProject, projectId);
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
+				projectViewPost.setSemester("20ss");
+				responsePut = client.putProject(projectViewPost, projectId);
 				assertEquals(400, responsePut.getLastStatusCode());
+				projectViewPost.setSemester(projectGet.getSemester());
+
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
+				projectViewPost.setSemester("2022sw");
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				projectViewPost.setSemester(projectGet.getSemester());
+
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
+				projectViewPost.setSemester("2022ww");
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				projectViewPost.setSemester(projectGet.getSemester());
+
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
 				final int semester = projectGet.getStudents().stream().findFirst().get().getSemester();
-				incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(semester));
-
-				incorrectProject.getStudents().forEach(studentView -> studentView.setSemester(0));//only 1-7 allowed
-				responsePut = client.putProject(incorrectProject, projectId);
+				projectViewPost.getStudents().forEach(studentView -> studentView.setSemester(8));//only 1-7 allowed
+				responsePut = client.putProject(projectViewPost, projectId);
 				assertEquals(400, responsePut.getLastStatusCode());
+				projectViewPost.getStudents().forEach(studentView -> studentView.setSemester(semester));
+
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
+				projectViewPost.getStudents().forEach(studentView -> studentView.setSemester(0));//only 1-7 allowed
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(400, responsePut.getLastStatusCode());
+				projectViewPost.getStudents().forEach(studentView -> studentView.setSemester(semester));
+
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
 				final String course = projectGet.getStudents().stream().findFirst().get().getCourse();
-				incorrectProject.getStudents().forEach(studentView -> studentView.setCourse(course));
 
-				incorrectProject.getStudents()
-					.forEach(studentView -> studentView.setCourse("bab"));//only 3 capital letters allowed
-				responsePut = client.putProject(incorrectProject, projectId);
+				projectViewPost.getStudents()
+					.forEach(studentView -> studentView.setCourse("babi"));//only 3 capital letters allowed
+				responsePut = client.putProject(projectViewPost, projectId);
 				assertEquals(400, responsePut.getLastStatusCode());
-				incorrectProject.getStudents().forEach(studentView -> studentView.setCourse(course));
+				projectViewPost.getStudents().forEach(studentView -> studentView.setCourse(course));
 
-				incorrectProject.getStudents()
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
+				projectViewPost.getStudents()
 					.forEach(studentView -> studentView.setCourse("EINI"));//only 3 capital letters allowed
-				responsePut = client.putProject(incorrectProject, projectId);
+				responsePut = client.putProject(projectViewPost, projectId);
 				assertEquals(400, responsePut.getLastStatusCode());
-				incorrectProject.getStudents().forEach(studentView -> studentView.setCourse(course));
+				projectViewPost.getStudents().forEach(studentView -> studentView.setCourse(course));
 
-				incorrectProject.getSupervisors()
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
+				projectViewPost.getSupervisors()
 					.forEach(supervisorView -> supervisorView.setEmail("wrongEmail.de")); //'@' and '.' are mandatory
-				responsePut = client.putProject(incorrectProject, projectId);
+				responsePut = client.putProject(projectViewPost, projectId);
 				assertEquals(400, responsePut.getLastStatusCode());
 				final String email = projectGet.getSupervisors().stream().findFirst().get().getEmail();
-				incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+				projectViewPost.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
 
-				incorrectProject.getSupervisors()
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
+				projectViewPost.getSupervisors()
 					.forEach(supervisorView -> supervisorView.setEmail("a@ae")); //'@' and '.' are mandatory
-				responsePut = client.putProject(incorrectProject, projectId);
+				responsePut = client.putProject(projectViewPost, projectId);
 				assertEquals(400, responsePut.getLastStatusCode());
-				incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+				projectViewPost.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
 
-				incorrectProject.getSupervisors()
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
+				projectViewPost.getSupervisors()
 					.forEach(supervisorView -> supervisorView.setEmail("z@.uu")); //'@' and '.' are mandatory
-				responsePut = client.putProject(incorrectProject, projectId);
+				responsePut = client.putProject(projectViewPost, projectId);
 				assertEquals(400, responsePut.getLastStatusCode());
-				incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+				projectViewPost.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
 
-				incorrectProject.getSupervisors()
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
+				projectViewPost.getSupervisors()
 					.forEach(supervisorView -> supervisorView.setEmail("@t.de")); //'@' and '.' are mandatory
-				responsePut = client.putProject(incorrectProject, projectId);
+				responsePut = client.putProject(projectViewPost, projectId);
 				assertEquals(400, responsePut.getLastStatusCode());
-				incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+				projectViewPost.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
 
-				incorrectProject.getSupervisors()
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
+				projectViewPost.getSupervisors()
 					.forEach(supervisorView -> supervisorView.setEmail("b@bb.")); //'@' and '.' are mandatory
-				responsePut = client.putProject(incorrectProject, projectId);
+				responsePut = client.putProject(projectViewPost, projectId);
 				assertEquals(400, responsePut.getLastStatusCode());
-				incorrectProject.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+				projectViewPost.getSupervisors().forEach(superVisorView -> superVisorView.setEmail(email));
+
+				responsePut = client.putProject(projectViewPost, projectId);
+				assertEquals(204, responsePut.getLastStatusCode());
+
 			}
 			{
 				final Optional<ProjectView> result = responseGet.getResponseData().stream().findFirst();
