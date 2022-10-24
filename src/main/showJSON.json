@@ -1,0 +1,52 @@
+[
+  {
+    "description": "we try to create an API for projects",
+    "id": 1,
+    "name": "duplicateNameForTesting",
+    "semester": "2022ss",
+    "students": [
+      {
+        "course": "BIN",
+        "firstName": "Julian",
+        "id": 0,
+        "lastName": "Sehne",
+        "semester": 4
+      }
+    ],
+    "supervisors": [
+      {
+        "email": "peter.braun@fhws.de",
+        "firstName": "Peter",
+        "id": 0,
+        "lastName": "Braun",
+        "title": "Prof."
+      }
+    ],
+    "type": "duplicateTypeForTesting"
+  },
+  {
+    "description": "we try to create an API for projects",
+    "id": 2,
+    "name": "duplicateNameForTesting",
+    "semester": "0000ss",
+    "students": [
+      {
+        "course": "BIN",
+        "firstName": "Julian",
+        "id": 0,
+        "lastName": "Sehne",
+        "semester": 4
+      }
+    ],
+    "supervisors": [
+      {
+        "email": "peter.braun@fhws.de",
+        "firstName": "Peter",
+        "id": 0,
+        "lastName": "Braun",
+        "title": "Prof."
+      }
+    ],
+    "type": "programming project"
+  }
+]

@@ -176,9 +176,10 @@ public class ProjectStorage
 		return StringUtils.isEmpty(semester) || project.getSemester().equals(semester);
 	}
 
-	public static void main(String[] args)
-	{
-		ProjectStorage projectStorage = new ProjectStorage();
-		System.out.println(projectStorage.matchRegex("BIN", "^([A-Z]|[a-z])([A-Z]|[a-z])([A-Z]|[a-z])$"));
-	}
+	//test regex
+	//	public static void main(String[] args)
+	//	{
+	//		ProjectStorage projectStorage = new ProjectStorage();
+	//		System.out.println(projectStorage.matchRegex("BIN", "^([A-Z]|[a-z])([A-Z]|[a-z])([A-Z]|[a-z])$"));
+	//	}
 }
